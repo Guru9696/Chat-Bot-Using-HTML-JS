@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Portfolio</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    /* Header Section */
+    header {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 3em;
+    }
+
+    header p {
+      font-size: 1.2em;
+    }
+
+    .profile-photo {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-top: 20px;
+      object-fit: cover;
+    }
+
+    /* Chatbot Window */
+    .chatbot-window {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 350px;
+      height: 450px;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .chatbot-header {
+      background-color: #1f78ff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .chatbot-body {
+      padding: 10px;
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-bottom: 50px; /* Space for input field */
+    }
+
+    .chatbot-message {
+      margin-bottom: 15px;
+    }
+
+    .chatbot-message p {
+      background-color: #f1f1f1;
+      padding: 8px 12px;
+      border-radius: 20px;
+      max-width: 80%;
+    }
+
+    .user-message p {
+      background-color: #d4edda;
+      align-self: flex-end;
+    }
+
+    .bot-message p {
+      background-color: #e2e3e5;
+    }
+
+    .chat-input-container {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #f4f4f9;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
+    .chat-input {
+      border: none;
+      padding: 10px;
+      width: calc(100% - 40px); /* To leave space for the send button */
+      border-radius: 20px;
+      background-color: #fff;
+      margin-right: 10px;
+    }
+
+    .send-button {
+      background-color: #1f78ff;
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: white;
+    }
+
+    .send-button i {
+      font-size: 18px;
+    }
+
+    /* Chatbot Icon (GIF Robot) */
+    .chatbot-icon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      display: inline-block;
+      background-color: #ffcb00;
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+      animation: bounce 2s infinite; /* Add animation */
+    }
+
+    /* Animation for icon */
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .chatbot-icon img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .chatbot-icon:hover {
+      transform: scale(1.1);
+      background-color: #ff9900;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Home Section -->
+  <header>
+    <img src="your-photo.jpg" alt="Your Name" class="profile-photo">
+    <h1>Gaurav Jadhav</h1>
+    <p>Web Developer | UI/UX Designer</p>
+  </header>
+
+  <!-- Chatbot Icon (Animated Robot GIF) -->
+  <div id="chatbot-icon" class="chatbot-icon">
+    <!-- Replace 'robot.gif' with your animated GIF path -->
+    <img src="https://cdn.dribbble.com/users/42048/screenshots/8350927/robotintro_dribble.gif" width="100%" alt="Chatbot Icon">
+  </div>
+
+  <!-- Chatbot Window -->
+  <div id="chatbot-window" class="chatbot-window">
+    <div class="chatbot-header">
+      <span>Chatbot</span>
+      <button class="close-chatbot" onclick="closeChatbot()">×</button>
+    </div>
+    <div class="chatbot-body">
+      <div class="chatbot-message bot-message">
+        <p>Hi! How can I assist you today? Feel free to ask me about my work or projects.</p>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chat-input" class="chat-input" placeholder="Type a message..." />
+      <button class="send-button" onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Show chatbot window
+    document.querySelector('#chatbot-icon').addEventListener('click', function() {
+      document.getElementById('chatbot-window').style.display = 'block';
+    });
+
+    // Close chatbot window
+    function closeChatbot() {
+      document.getElementById('chatbot-window').style.display = 'none';
+    }
+
+    // Handle message sending
+    function sendMessage() {
+      let userMessage = document.getElementById('chat-input').value.toLowerCase();
+      if (userMessage.trim()) {
+        // Display the user's message
+        let messageDiv = document.createElement('div');
+        messageDiv.classList.add('chatbot-message', 'user-message');
+        messageDiv.innerHTML = `<p>${userMessage}</p>`;
+        document.querySelector('.chatbot-body').appendChild(messageDiv);
+        document.getElementById('chat-input').value = '';
+
+        // Get bot response from the predefined set
+        let botResponse = getBotResponse(userMessage);
+
+        // Display the bot's response
+        setTimeout(function() {
+          let botMessageDiv = document.createElement('div');
+          botMessageDiv.classList.add('chatbot-message', 'bot-message');
+          botMessageDiv.innerHTML = `<p>${botResponse}</p>`;
+          document.querySelector('.chatbot-body').appendChild(botMessageDiv);
+          document.querySelector('.chatbot-body').scrollTop = document.querySelector('.chatbot-body').scrollHeight;
+        }, 1000);
+      }
+    }
+
+    // Function to get bot's response based on user input
+    function getBotResponse(userMessage) {
+      const responses = {
+        "hello": "Hello! Welcome to my portfolio. How can I assist you today?",
+        "hi": "Hi there! How can I help you explore my portfolio?",
+        "who are you": "I am a passionate web developer and designer. I specialize in creating beautiful and functional websites.",
+        "what is your experience": "I have experience in both front-end and back-end development, working with technologies like HTML, CSS, JavaScript, React, Node.js, and MongoDB.",
+        "thank you": "You're welcome! Feel free to reach out if you have any more questions."
+      };
+
+      return responses[userMessage] || "Sorry, I didn't quite understand that. Could you please rephrase?";
+    }
+  </script>
+</body>
+</html>
