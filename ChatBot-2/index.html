@@ -39,11 +39,21 @@
       margin-top: 20px;
       object-fit: cover;
     }
+    .zoom {
+      transition: transform 0.3s ease; /* Smooth transition */
+      transform: scale(2); /* Scale up the image */
+      border-radius: 50%;
+    }
+
+    .zoom:hover {
+      transform: scale(3); /* Scale up the image */
+      border-radius: 50%;
+    }
 
     /* Chatbot Window */
     .chatbot-window {
       position: fixed;
-      bottom: 80px;
+      bottom: 150px;
       right: 20px;
       width: 350px;
       height: 450px;
@@ -67,41 +77,71 @@
       border-top-right-radius: 12px;
     }
 
-    .chatbot-body {
-      padding: 10px;
-      flex-grow: 1;
-      overflow-y: auto;
-      padding-bottom: 50px; /* Space for input field */
-    }
+/* Chatbot body for displaying messages */
+.chatbot-body {
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;  /* Enables vertical scrolling */
+    height: 300px;     /* Fixed height for the chat container */
+    padding-bottom: 30px;
+}
 
-    .chatbot-message {
-      margin-bottom: 15px;
-    }
+/* Style for each message container */
+.chatbot-message {
+    position: relative;
+    bottom: 0;
+    padding: 1vw;
+    /* margin-top: 0px; */
+    padding-top: 0px;
+    clear: both; /* Prevents overlap by ensuring each message is placed on a new line */
+}
 
-    .chatbot-message p {
-      background-color: #f1f1f1;
-      padding: 8px 12px;
-      border-radius: 20px;
-      max-width: 80%;
-    }
+/* Styling for paragraph inside each message */
+.chatbot-message p {
+    background-color: #f1f1f1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    max-width: 80%;
+    margin: 0px;
+    word-wrap: break-word; /* Ensures long words break into the next line */
+    word-break: break-word; /* Breaks very long words */
+    white-space: pre-wrap;  /* Ensures that long text with spaces also wraps correctly */
+}
 
-    .user-message p {
-      background-color: #d4edda;
-      align-self: flex-end;
-    }
+/* User message styling */
+.user-message p {
+    background-color: #d4edda;
+    float: right;
+   
+    margin-bottom: 15px; /* Space below the user message */
+}
 
-    .bot-message p {
-      background-color: #e2e3e5;
-    }
+/* Bot message styling */
+.bot-message p {
+    background-color: #e2e3e5;
+    margin-top: 10px;  /* Space above the bot message */
+}
 
-    .chat-input-container {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      background-color: #f4f4f9;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-    }
+/* Adjust the margin between user and bot messages */
+.user-message {
+    margin-bottom: 15px; /* Adds margin after user message */
+}
+
+.bot-message {
+    margin-top: 15px;  /* Adds margin before bot message */
+}
+
+/* Input container */
+.chat-input-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f4f4f9;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+
 
     .chat-input {
       border: none;
@@ -129,11 +169,11 @@
     .chatbot-icon {
       position: fixed;
       bottom: 20px;
-      right: 20px;
+      right: 25px;
       z-index: 999;
       display: inline-block;
       background-color: #ffcb00;
-      padding: 12px;
+      padding: 25px;
       border-radius: 50%;
       cursor: pointer;
       transition: transform 0.3s, background-color 0.3s;
@@ -174,7 +214,7 @@
   <!-- Chatbot Icon (Animated Robot GIF) -->
   <div id="chatbot-icon" class="chatbot-icon">
     <!-- Replace 'robot.gif' with your animated GIF path -->
-    <img src="https://cdn.dribbble.com/users/42048/screenshots/8350927/robotintro_dribble.gif" width="100%" alt="Chatbot Icon">
+    <img  src="https://cdn.dribbble.com/users/42048/screenshots/8350927/robotintro_dribble.gif" width="100px" height="100px" class="zoom" alt="Chatbot Icon">
   </div>
 
   <!-- Chatbot Window -->
@@ -200,11 +240,13 @@
     // Show chatbot window
     document.querySelector('#chatbot-icon').addEventListener('click', function() {
       document.getElementById('chatbot-window').style.display = 'block';
+
     });
 
     // Close chatbot window
     function closeChatbot() {
       document.getElementById('chatbot-window').style.display = 'none';
+      
     }
 
     // Handle message sending
@@ -232,18 +274,180 @@
       }
     }
 
-    // Function to get bot's response based on user input
-    function getBotResponse(userMessage) {
-      const responses = {
-        "hello": "Hello! Welcome to my portfolio. How can I assist you today?",
-        "hi": "Hi there! How can I help you explore my portfolio?",
-        "who are you": "I am a passionate web developer and designer. I specialize in creating beautiful and functional websites.",
-        "what is your experience": "I have experience in both front-end and back-end development, working with technologies like HTML, CSS, JavaScript, React, Node.js, and MongoDB.",
-        "thank you": "You're welcome! Feel free to reach out if you have any more questions."
-      };
+    // // Get the bot's response based on user input
+    // function getBotResponse(userMessage) {
+    //       for (let category in chatbotData) {
+    //         const responses = chatbotData[category];
+    //         for (let response of responses) {
+    //           if (userMessage.includes(response.user)) {
+    //             return response.bot;
+    //           }
+    //         }
+    //       }
+    //       return chatbotData.default.bot; // Return default response if no match found
+    //     }
 
-      return responses[userMessage] || "Sorry, I didn't quite understand that. Could you please rephrase?";
+// Function to clean input text (remove punctuation, convert to lowercase)
+function cleanText(text) {
+    return text.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+}
+
+// Function to calculate how many words in the user input match the predefined question
+function getMatchingWordsCount(userMessage, predefinedQuestion) {
+    const cleanedUserMessage = cleanText(userMessage);
+    const cleanedPredefinedQuestion = cleanText(predefinedQuestion);
+
+    const userWords = cleanedUserMessage.split(' ');
+    const predefinedWords = cleanedPredefinedQuestion.split(' ');
+
+    let matchCount = 0;
+
+    // Count the number of matching words between the user input and predefined question
+    userWords.forEach(userWord => {
+        if (predefinedWords.includes(userWord)) {
+            matchCount++;
+        }
+    });
+
+    return matchCount;
+}
+
+// Function to get the bot's response based on the highest word match
+function getBotResponse(userMessage) {
+    console.log("User message:", userMessage);
+
+    let bestMatch = { bot: chatbotData.default.bot, matchCount: 0 };
+
+    // Loop through predefined responses
+    for (let category in chatbotData) {
+        if (category === 'default') continue;  // Skip the default category
+
+        const responses = chatbotData[category];
+
+        // Loop through each response in the category
+        for (let response of responses) {
+            const matchCount = getMatchingWordsCount(userMessage, response.user);
+
+            console.log(`Matching words between "${userMessage}" and "${response.user}": ${matchCount}`);
+
+            // If this is the best match so far, update the bestMatch
+            if (matchCount > bestMatch.matchCount) {
+                bestMatch = { bot: response.bot, matchCount: matchCount };
+            }
+        }
     }
+
+    console.log("Best match response:", bestMatch.bot);  // Log the best match response
+    return bestMatch.bot;
+}
+
+
+          // Portfolio Chatbot JSON Data
+          const chatbotData = {
+      "greetings": [
+        { "user": "hello", "bot": "Hello! Welcome to my portfolio. How can I assist you today?" },
+        { "user": "hi", "bot": "Hi there! How can I help you explore my portfolio?" },
+        { "user": "hey", "bot": "Hey! Feel free to ask me anything about my work." },
+        { "user": "good morning", "bot": "Good morning! How can I assist you today?" },
+    { "user": "good afternoon", "bot": "Good afternoon! How can I help?" },
+    { "user": "good evening", "bot": "Good evening! What can I do for you?" },
+    { "user": "yo", "bot": "Yo! How’s it going? What can I help with?" }
+      ],
+      "common_ask": [
+    { "user": "What’s up?", "bot": "Not much! How can I help you today?" },
+    { "user": "How are you?", "bot": "I'm doing great, thanks for asking! How can I assist you?" },
+    { "user": "What time is it?", "bot": "I can’t check the time, but feel free to ask again later!" },
+    { "user": "Where are you?", "bot": "I’m right here to help you online!" },
+    { "user": "What’s new?", "bot": "Not much! What would you like to know?" },
+    { "user": "Who are you?", "bot": "I’m your friendly assistant here to help with anything!" },
+    { "user": "Can you help?", "bot": "Of course! What do you need help with?" },
+    { "user": "What’s next?", "bot": "What would you like to do next?" },
+    { "user": "How do I start?", "bot": "Just let me know what you need help with, and I’ll guide you!" },
+    { "user": "Why?", "bot": "Could you clarify what you’re asking about?" }
+],
+
+      "about_me": [
+        { "user": "who are you?", "bot": "I am a passionate web developer and designer. I specialize in creating beautiful and functional websites." },
+        { "user": "tell me about yourself", "bot": "I’m a web developer with experience in front-end and back-end technologies. Feel free to explore my projects!" },
+        { "user": "what is your background?", "bot": "I have a background in computer science and I’ve worked on various web development projects, using modern technologies." },
+        { "user": "where are you from?", "bot": "I am based in [Your Location], but I work with clients from all over the world." },
+        { "user": "how did you start programming?", "bot": "I started programming in college when I realized my passion for building digital solutions and websites." }
+      ],
+      "skills": [
+        { "user": "what are your skills?", "bot": "I specialize in HTML, CSS, JavaScript, React, Node.js, Express, and MongoDB." },
+        { "user": "do you know JavaScript?", "bot": "Yes! I have extensive experience with JavaScript, both for front-end and back-end development." },
+        { "user": "do you know React?", "bot": "Yes! React is one of my favorite libraries for building dynamic user interfaces." },
+        { "user": "are you familiar with Node.js?", "bot": "Absolutely! I’ve built several server-side applications using Node.js and Express." },
+        { "user": "what is your experience with CSS?", "bot": "I have a deep understanding of CSS and CSS frameworks like Bootstrap and Tailwind, which I use to create responsive designs." }
+      ],
+      "projects": [
+        { "user": "what projects have you worked on?", "bot": "I’ve worked on various web development projects, from single-page applications to full-stack solutions." },
+        { "user": "tell me about your projects", "bot": "My projects include e-commerce websites, blogs, and task management apps. Check out the 'Projects' section for more details." },
+        { "user": "what is your most recent project?", "bot": "My most recent project is a full-stack e-commerce website built with React and Node.js." },
+        { "user": "have you worked on a weather app?", "bot": "Yes, I’ve built a dynamic weather app using React and the OpenWeather API." },
+        { "user": "have you built a portfolio website?", "bot": "Yes, you’re currently browsing my portfolio website! I designed and developed it using HTML, CSS, and JavaScript." }
+      ],
+      "technologies": [
+        { "user": "which technologies do you use?", "bot": "I use technologies such as React, Node.js, Express, MongoDB, HTML5, CSS3, and JavaScript." },
+        { "user": "do you use Git?", "bot": "Yes! Git is an essential tool for version control and collaboration." },
+        { "user": "do you use any frameworks?", "bot": "Yes, I use frameworks like React, Express, and Bootstrap to speed up development and create scalable applications." },
+        { "user": "do you use any CSS preprocessors?", "bot": "Yes, I use Sass for CSS preprocessing to write clean and maintainable stylesheets." },
+        { "user": "what databases do you use?", "bot": "I mainly work with MongoDB, but I have also used SQL databases like MySQL and PostgreSQL in some projects." }
+      ],
+      "freelance": [
+        { "user": "do you offer freelance services?", "bot": "Yes, I offer freelance web development services. Feel free to reach out for any freelance opportunities." },
+        { "user": "how can I hire you?", "bot": "You can contact me through the 'Contact' section of my website or send me an email directly." },
+        { "user": "what services do you offer?", "bot": "I offer web development, UI/UX design, and maintenance services for websites and applications." },
+        { "user": "do you do custom web design?", "bot": "Yes, I specialize in creating custom web designs tailored to your needs and brand identity." },
+        { "user": "can you help with SEO?", "bot": "Yes, I can help optimize your website for search engines, making it more discoverable to users." }
+      ],
+      "contact": [
+        { "user": "how can I contact you?", "bot": "You can contact me via the contact form on this website or directly through email and social media." },
+        { "user": "do you have social media?", "bot": "Yes! You can find me on LinkedIn, GitHub, and Twitter. Check the footer for my social media links." },
+        { "user": "can I book a consultation with you?", "bot": "Yes, I offer consultations for new projects. Feel free to reach out to discuss your needs." },
+        { "user": "what is your email?", "bot": "You can email me at [your.email@example.com]. I’ll get back to you as soon as possible." },
+        { "user": "do you offer support?", "bot": "Yes, I offer ongoing support and maintenance for the projects I work on." }
+      ],
+      "learning": [
+        { "user": "are you learning anything new?", "bot": "Yes! I’m currently learning TypeScript and exploring serverless architecture." },
+        { "user": "how do you keep your skills updated?", "bot": "I follow online courses, read blogs, and experiment with new tools and technologies to keep my skills sharp." },
+        { "user": "do you plan to learn new languages?", "bot": "Yes, I plan to learn more about Python and its frameworks in the future." },
+        { "user": "do you attend developer conferences?", "bot": "Yes, I attend developer conferences and meetups to stay updated and network with others in the industry." },
+        { "user": "are you familiar with cloud services?", "bot": "Yes, I have experience with cloud platforms like AWS and Firebase for hosting and deploying applications." }
+      ],
+      "about_projects": [
+        { "user": "what’s the most challenging project you’ve worked on?", "bot": "The most challenging project was building a real-time chat application with socket.io, which required efficient state management and handling multiple users." },
+        { "user": "do you have a project in Node.js?", "bot": "Yes, I have worked on multiple projects using Node.js, including a task management app and a RESTful API." },
+        { "user": "can I see your code?", "bot": "Sure! You can find my code on my GitHub profile. It’s open-source and available for review." },
+        { "user": "have you worked on e-commerce websites?", "bot": "Yes, I’ve built full-fledged e-commerce websites with payment integrations using React and Node.js." },
+        { "user": "what is your favorite project?", "bot": "My favorite project is a custom content management system (CMS) I built for a client, which gave them complete control over their website." }
+      ],
+      "UI/UX": [
+        { "user": "do you design user interfaces?", "bot": "Yes, I design user interfaces with a focus on usability and aesthetics. I use Figma and Adobe XD for designing." },
+        { "user": "what is your approach to UI/UX design?", "bot": "My approach involves understanding the user’s needs and ensuring that the design is both functional and visually appealing." },
+        { "user": "do you do prototyping?", "bot": "Yes, I create prototypes to help visualize how the user will interact with the design before development begins." },
+        { "user": "do you test your designs?", "bot": "Absolutely! I conduct user testing to ensure the design is intuitive and user-friendly." },
+        { "user": "do you follow design trends?", "bot": "Yes, I stay updated with the latest design trends to ensure my projects align with current best practices." }
+      ],
+      "additional_info": [
+        { "user": "why should I hire you?", "bot": "I’m dedicated, efficient, and passionate about delivering high-quality projects that exceed expectations." },
+        { "user": "what makes you stand out?", "bot": "I combine creativity with technical expertise, ensuring both the design and functionality of a website are top-notch." },
+        { "user": "how do you handle deadlines?", "bot": "I prioritize tasks, plan ahead, and communicate clearly to ensure I meet deadlines without compromising on quality." },
+        { "user": "do you provide documentation for your projects?", "bot": "Yes, I provide thorough documentation for all projects, including setup guides and technical specifications." },
+        { "user": "are you available for a full-time position?", "bot": "At the moment, I am available for freelance work and contract positions, but I am open to full-time opportunities." }
+      ],
+      "closing": [
+        { "user": "thank you", "bot": "You're welcome! Feel free to reach out if you have any more questions." },
+        { "user": "thanks", "bot": "No problem! I'm happy to help. Let me know if you need anything else." },
+        { "user": "goodbye", "bot": "Goodbye! Have a great day. I hope to hear from you soon." },
+        { "user": "see you later", "bot": "See you! Don’t hesitate to reach out if you need anything." },
+        { "user": "take care", "bot": "Take care! Looking forward to working together in the future." }
+      ],
+      "default": {
+        "bot": "Sorry, I didn't quite understand that. Could you please rephrase?"
+      }
+    };
+    
   </script>
 </body>
 </html>
