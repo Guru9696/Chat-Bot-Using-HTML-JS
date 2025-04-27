@@ -62,3 +62,6 @@ Ensure that you have a web browser installed, as this project runs directly in t
 
 - Inspiration from various chatbot development tutorials and resources.
 
+
+## Contact
+For any inquiries or support, please contact [Your Name] at [your-email@example.com].
